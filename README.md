@@ -46,8 +46,8 @@ For the first start you'll need to provide the __ADMIN\_USER__ and __ADMIN\_PASS
 
     docker run -d --name mysql \
     -e 'ADMIN_USER=dbadmin' -e 'ADMIN_PASSWORD=pa55worD!' \
-    -e 'BIND_ADDRESS=192.0.3.33'
-    -e 'BACKUP_ENABLED=yes' -e 'BACKUP_CRON_TIME=0 * * * *'
+    -e 'BIND_ADDRESS=192.0.3.33' \
+    -e 'BACKUP_ENABLED=yes' -e 'BACKUP_CRON_TIME=0 * * * *' \
     -p 3306:3306 \
     -v /tmp/mysqldata:/var/lib/mysql \
     -v /tmp/mysqlbackup:/var/mysql-backup \
