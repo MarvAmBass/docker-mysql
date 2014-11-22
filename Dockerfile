@@ -5,6 +5,8 @@ RUN apt-get update && apt-get install -y \
     mysql-server \
     mysql-client
 
+RUN rm -rf /var/lib/mysql/*
+
 ADD mysql-backuper.sh /usr/local/bin/mysql-backuper.sh
 RUN chmod a+x /usr/local/bin/mysql-backuper.sh
 
