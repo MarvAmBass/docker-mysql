@@ -1,5 +1,7 @@
-# Docker MySQL-Server Container
+# Docker MySQL-Server Container (marvambass/mysql)
 _maintained by MarvAmBass_
+
+[FAQ - All you need to know about the marvambass Containers](http://marvin.im/posts/IT/Docker/marvambass/FAQ__All_you_need_to_know_about_the_marvambass_Containers.html)
 
 ## What is it
 
