@@ -14,6 +14,7 @@ ENV MYSQL_DEFAULTS_FILE /mysql-defaults.cnf
 
 EXPOSE 3306
 VOLUME ["/var/lib/mysql/"]
+VOLUME ["/var/mysql-backup"]
 
 ADD ./startup.sh /opt/startup.sh
 RUN chmod a+x /opt/startup.sh
