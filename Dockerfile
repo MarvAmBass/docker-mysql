@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 MAINTAINER MarvAmBass
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update; apt-get install -y \
     mysql-server \
     mysql-client
 
