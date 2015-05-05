@@ -93,6 +93,9 @@ if [ ! -f /var/lib/mysql/ibdata1 ]; then
 fi
 echo ">> db installed"
 
+echo ">> set owner and group to current mysql user and group"
+chown -R mysql:mysql /var/lib/mysql
+
 echo ">> starting mysql daemon"
 echo ">> you can connect via mysql cli with the following command:"
 echo "   mysql -u $ADMIN_USER -p -h $MY_IP"
