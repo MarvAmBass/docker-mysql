@@ -40,7 +40,7 @@ In default it stores it's dumps beneath: __/var/mysql-backup__
 * __BACKUP_PATH__
  * default: _/var/mysql-backup_ - the place to store the mysqldumps
 
-## Using the marvambass/mysql Container 
+## Using the marvambass/mysql Container
 
 ### Running MySQL
 
@@ -53,6 +53,7 @@ For the first start you'll need to provide the __ADMIN\_USER__ and __ADMIN\_PASS
     -p 3306:3306 \
     -v /tmp/mysqldata:/var/lib/mysql \
     -v /tmp/mysqlbackup:/var/mysql-backup \
+    -v /tmp/mysqlbackup:/var/log/mysql \
     marvambass/mysql
 _you need to provide the credentials only if you start the container for the first time (so it can initialize a new Database) or if you use the internal mysqldump backup mechanism_
 
@@ -61,6 +62,6 @@ _you need to provide the credentials only if you start the container for the fir
 Now you can connect to the MySQL Server via the normal mysql-client cli:
 
     mysql -u $ADMIN_USER -p -h $(docker inspect --format='{{.NetworkSettings.IPAddress}}' $CONTAINER_ID)
-    
+
 You could also use my __marvambass/phpmyadmin__ container and link them together.  
 _You only link __phpmyadmin__ to __mysql__ container if you want to use phpmyadmin!_
