@@ -34,7 +34,7 @@ function enable_backups {
 
   echo ">> creating $MYSQL_DEFAULTS_FILE file"
   create_mysql_defaults_file
-  
+
   echo ">> starting cron daemon"
   cron -f &
 }
@@ -56,7 +56,7 @@ MY_IP=`ip a s eth0 | grep inet | awk '{print $2}' | sed 's/\/.*//g' | head -n1`
 CREDENTIALS_PROVIDED="yes"
 if [ -z ${ADMIN_USER+x} ]
 then
-  >&2 echo ">> no \$ADMIN_USER specified" 
+  >&2 echo ">> no \$ADMIN_USER specified"
   ADMIN_USER="\$ADMIN_USER"
   CREDENTIALS_PROVIDED="no"
 fi
@@ -95,6 +95,7 @@ echo ">> db installed"
 
 echo ">> set owner and group to current mysql user and group"
 chown -R mysql:mysql /var/lib/mysql
+chown -R mysql:mysql /var/log/mysql
 
 echo ">> starting mysql daemon"
 echo ">> you can connect via mysql cli with the following command:"
