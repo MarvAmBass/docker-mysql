@@ -86,6 +86,9 @@ fi
 echo ">> bind mysql daemon to $BIND_ADDRESS"
 sed -i -e "s/^bind-address\s*=\s*127.0.0.1/bind-address = $BIND_ADDRESS/" /etc/mysql/my.cnf
 
+echo ">> disable dns resolution for mysql (speeds it up)"
+sed -i 's/\[mysqld\]/&\nskip-host-cache\nskip-name-resolve/g' /etc/mysql/my.cnf
+
 if [ ! -f /var/lib/mysql/ibdata1 ]; then
   echo ">> init db"
   exit_if_no_credentials_provided
