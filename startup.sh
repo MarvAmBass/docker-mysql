@@ -103,4 +103,4 @@ chown -R mysql:mysql /var/log/mysql
 echo ">> starting mysql daemon"
 echo ">> you can connect via mysql cli with the following command:"
 echo "   mysql -u $ADMIN_USER -p -h $MY_IP"
-/usr/bin/mysqld_safe
+exec /usr/bin/mysqld_safe
