@@ -56,7 +56,7 @@ In default it stores it's dumps beneath: __/var/mysql-backup__
 
 #### Quickstart
 
-The following command starts a in memory mysql database which will be lost after the container is deleted.
+The following command starts a non persistent mysql database which will be lost after the container is deleted.
 
     docker run -d --name mysql -e 'ADMIN_USER=dbadmin' -e 'ADMIN_PASSWORD=adminpw' -e 'DB_NAME=testdb' -e 'DB_USER=testdbuser' -e 'DB_PASSWORD=usersecret' marvambass/mysql
 
