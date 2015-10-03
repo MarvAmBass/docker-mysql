@@ -40,6 +40,16 @@ In default it stores it's dumps beneath: __/var/mysql-backup__
 * __BACKUP_PATH__
  * default: _/var/mysql-backup_ - the place to store the mysqldumps
 
+### Optional DB & User auto-creation
+
+* __DB\_NAME__
+ * no default - required if you want the auto create a database with user
+* __DB\_USER__
+ * no default - required if you want the auto create a database with user
+* __DB\_PASSWORD__
+ * no default - required if you want the auto create a database with user
+
+
 ## Using the marvambass/mysql Container
 
 ### Running MySQL

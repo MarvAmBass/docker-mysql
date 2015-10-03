@@ -100,6 +100,21 @@ echo ">> set owner and group to current mysql user and group"
 chown -R mysql:mysql /var/lib/mysql
 chown -R mysql:mysql /var/log/mysql
 
+# auto create db with user...
+if [ ! -z ${DB_NAME+x} ] && [ ! -z ${DB_USER+x} ] && [ ! -z ${DB_PASSWORD+x} ]
+then
+  echo ">> auto configuring db '$DB_NAME' with user '$DB_USER' and password '<hidden>'"
+  exit_if_no_credentials_provided
+
+  echo "CREATE DATABASE $DB_NAME;" > /tmp/autocreatedb.mysql
+  echo "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';" >> /tmp/autocreatedb.mysql
+  echo "GRANT USAGE ON *.* TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" >> /tmp/autocreatedb.mysql
+  echo "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';" >> /tmp/autocreatedb.mysql
+
+  bash -c "sleep 3; mysql -u\"$ADMIN_USER\" -p\"$ADMIN_PASSWORD\" < /tmp/autocreatedb.mysql && echo '>> db '$DB_NAME' successfully installed'; rm /tmp/autocreatedb.mysql" &
+fi
+
+
 echo ">> starting mysql daemon"
 echo ">> you can connect via mysql cli with the following command:"
 echo "   mysql -u $ADMIN_USER -p -h $MY_IP"
