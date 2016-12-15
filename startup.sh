@@ -50,71 +50,78 @@ EOF
 
 ## MAIN
 
-# variables stuff
-MY_IP=`ip a s eth0 | grep inet | awk '{print $2}' | sed 's/\/.*//g' | head -n1`
+INITALIZED="/initialized"
 
-CREDENTIALS_PROVIDED="yes"
-if [ -z ${ADMIN_USER+x} ]
-then
-  >&2 echo ">> no \$ADMIN_USER specified"
-  ADMIN_USER="\$ADMIN_USER"
-  CREDENTIALS_PROVIDED="no"
-fi
-if [ -z ${ADMIN_PASSWORD+x} ]
-then
-  >&2 echo ">> no \$ADMIN_PASSWORD specified"
-  CREDENTIALS_PROVIDED="no"
-fi
+if [ ! -f "$INITALIZED" ]; then
+  # variables stuff
+  MY_IP=`ip a s eth0 | grep inet | awk '{print $2}' | sed 's/\/.*//g' | head -n1`
 
-# backup stuff
-if [ "yes" != "$BACKUP_ENABLED" ]
-then
-  echo ">> disable auto-backups (mysqldump)"
+  CREDENTIALS_PROVIDED="yes"
+  if [ -z ${ADMIN_USER+x} ]
+  then
+    >&2 echo ">> no \$ADMIN_USER specified"
+    ADMIN_USER="\$ADMIN_USER"
+    CREDENTIALS_PROVIDED="no"
+  fi
+  if [ -z ${ADMIN_PASSWORD+x} ]
+  then
+    >&2 echo ">> no \$ADMIN_PASSWORD specified"
+    CREDENTIALS_PROVIDED="no"
+  fi
+
+  # backup stuff
+  if [ "yes" != "$BACKUP_ENABLED" ]
+  then
+    echo ">> disable auto-backups (mysqldump)"
+  else
+    echo ">> enable auto-backups (mysqldump)"
+    echo ">> backups will be stored at default path"
+    echo ">> !! link or overwrite it to gain access !!"
+    exit_if_no_credentials_provided
+    enable_backups
+  fi
+
+  # mysql daemon stuff
+  if [ -z ${BIND_ADDRESS+x} ]
+  then
+    BIND_ADDRESS="0.0.0.0"
+  fi
+  echo ">> bind mysql daemon to $BIND_ADDRESS"
+  sed -i -e "s/^bind-address\s*=\s*127.0.0.1/bind-address = $BIND_ADDRESS/" /etc/mysql/my.cnf
+
+  echo ">> disable dns resolution for mysql (speeds it up)"
+  sed -i 's/\[mysqld\]/&\nskip-host-cache\nskip-name-resolve/g' /etc/mysql/my.cnf
+
+  if [ ! -f /var/lib/mysql/ibdata1 ]; then
+    echo ">> init db"
+    exit_if_no_credentials_provided
+    init_db
+  fi
+  echo ">> db installed"
+
+  echo ">> set owner and group to current mysql user and group"
+  chown -R mysql:mysql /var/lib/mysql
+  chown -R mysql:mysql /var/log/mysql
+
+  # auto create db with user...
+  if [ ! -z ${DB_NAME+x} ] && [ ! -z ${DB_USER+x} ] && [ ! -z ${DB_PASSWORD+x} ]
+  then
+    echo ">> auto configuring db '$DB_NAME' with user '$DB_USER' and password '<hidden>'"
+    exit_if_no_credentials_provided
+
+    echo "CREATE DATABASE $DB_NAME;" > /tmp/autocreatedb.mysql
+    echo "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';" >> /tmp/autocreatedb.mysql
+    echo "GRANT USAGE ON *.* TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" >> /tmp/autocreatedb.mysql
+    echo "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';" >> /tmp/autocreatedb.mysql
+    echo "FLUSH PRIVILEGES;" >> /tmp/autocreatedb.mysql
+
+    bash -c "sleep 3; mysql -u\"$ADMIN_USER\" -p\"$ADMIN_PASSWORD\" < /tmp/autocreatedb.mysql && echo '>> db '$DB_NAME' successfully installed'; rm /tmp/autocreatedb.mysql" &
+  fi
+
+  touch "$INITALIZED"
 else
-  echo ">> enable auto-backups (mysqldump)"
-  echo ">> backups will be stored at default path"
-  echo ">> !! link or overwrite it to gain access !!"
-  exit_if_no_credentials_provided
-  enable_backups
+  echo ">> already initialized - direct start of mysqld"
 fi
-
-# mysql daemon stuff
-if [ -z ${BIND_ADDRESS+x} ]
-then
-  BIND_ADDRESS="0.0.0.0"
-fi
-echo ">> bind mysql daemon to $BIND_ADDRESS"
-sed -i -e "s/^bind-address\s*=\s*127.0.0.1/bind-address = $BIND_ADDRESS/" /etc/mysql/my.cnf
-
-echo ">> disable dns resolution for mysql (speeds it up)"
-sed -i 's/\[mysqld\]/&\nskip-host-cache\nskip-name-resolve/g' /etc/mysql/my.cnf
-
-if [ ! -f /var/lib/mysql/ibdata1 ]; then
-  echo ">> init db"
-  exit_if_no_credentials_provided
-  init_db
-fi
-echo ">> db installed"
-
-echo ">> set owner and group to current mysql user and group"
-chown -R mysql:mysql /var/lib/mysql
-chown -R mysql:mysql /var/log/mysql
-
-# auto create db with user...
-if [ ! -z ${DB_NAME+x} ] && [ ! -z ${DB_USER+x} ] && [ ! -z ${DB_PASSWORD+x} ]
-then
-  echo ">> auto configuring db '$DB_NAME' with user '$DB_USER' and password '<hidden>'"
-  exit_if_no_credentials_provided
-
-  echo "CREATE DATABASE $DB_NAME;" > /tmp/autocreatedb.mysql
-  echo "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';" >> /tmp/autocreatedb.mysql
-  echo "GRANT USAGE ON *.* TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" >> /tmp/autocreatedb.mysql
-  echo "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';" >> /tmp/autocreatedb.mysql
-  echo "FLUSH PRIVILEGES;" >> /tmp/autocreatedb.mysql
-  
-  bash -c "sleep 3; mysql -u\"$ADMIN_USER\" -p\"$ADMIN_PASSWORD\" < /tmp/autocreatedb.mysql && echo '>> db '$DB_NAME' successfully installed'; rm /tmp/autocreatedb.mysql" &
-fi
-
 
 echo ">> starting mysql daemon"
 echo ">> you can connect via mysql cli with the following command:"
