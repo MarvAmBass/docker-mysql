@@ -71,8 +71,8 @@ For the first start you'll need to provide the __ADMIN\_USER__ and __ADMIN\_PASS
     -p 3306:3306 \
     -v /tmp/mysqldata:/var/lib/mysql \
     -v /tmp/mysqlbackup:/var/mysql-backup \
-    -v /tmp/mysqlbackup:/var/log/mysql \
     marvambass/mysql
+    
 _you need to provide the credentials only if you start the container for the first time (so it can initialize a new Database) or if you use the internal mysqldump backup mechanism_
 
 ### Connection

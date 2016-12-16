@@ -9,7 +9,7 @@ RUN apt-get -q -y update && \
 
 RUN rm -rf /var/lib/mysql/*; \
     rm -f /etc/mysql/conf.d/mysqld_safe_syslog.cnf; \
-    sed -i 's,^log_error.*,log_error = /dev/stderr,g' /etc/mysql/my.cnf
+    sed -i 's,^log_error,#log_error,g' /etc/mysql/my.cnf
 
 ADD mysql-backuper.sh /usr/local/bin/mysql-backuper.sh
 

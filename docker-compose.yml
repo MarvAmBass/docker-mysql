@@ -1,15 +1,15 @@
-Mysql:  image: marvambass/mysql
-  environment:
-    ADMIN_USER: root
-    ADMIN_PASSWORD: CHANGEME
-    BIND_ADDRESS: 0.0.0.0
-    BACKUP_ENABLED: "yes"
-    BACKUP_CRON_TIME: "1 * * * *"
-  volumes:
-    - "mysql/data:/var/lib/mysql"
-    - "mysql/backup:/var/mysql-backup"
-    - "mysql/conf:/etc/mysql"
-    - "mysql/logs:/var/log/mysql/"
-  ports:
-    - "3306:3306"
-  mem_limit: 1g
+version: "2"
+services:
+  mysql:
+    image: marvambass/mysql
+    environment:
+      ADMIN_USER: mysqladm
+      ADMIN_PASSWORD: CHANGEME
+      BIND_ADDRESS: 0.0.0.0
+      BACKUP_ENABLED: yes
+      BACKUP_CRON_TIME: "1 * * * *"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/backup:/var/mysql-backup
+    ports:
+      - 3306:3306
