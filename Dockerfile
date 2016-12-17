@@ -3,7 +3,8 @@ MAINTAINER MarvAmBass
 
 RUN apt-get -q -y update && \
     apt-get -q -y install mysql-server \
-                          mysql-client && \
+                          mysql-client \
+                          telnet && \
     apt-get -q -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*;
 
@@ -17,6 +18,9 @@ ENV MYSQL_DEFAULTS_FILE /mysql-defaults.cnf
 
 VOLUME ["/var/lib/mysql/", "/var/mysql-backup"]
 EXPOSE 3306
+
+COPY docker-healthcheck /usr/local/bin/
+HEALTHCHECK CMD ["docker-healthcheck"]
 
 ADD ./startup.sh /opt/startup.sh
 CMD ["/bin/bash", "/opt/startup.sh"]
